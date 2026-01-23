@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nunhead Repair Café — Repair Day</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <div class="brand">
+          <img class="logo" src="" alt="Nunhead Repair Café logo" />
+          <div class="brand-text">
+            <p class="brand-eyebrow">Repair Day Dashboard</p>
+            <h1 class="brand-title" data-role="title">Nunhead Repair Café</h1>
+          </div>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Successful repairs today</p>
+          <p class="stat-value" data-role="repaired-count">0</p>
+        </div>
+      </header>
+
+      <section class="boards">
+        <div class="board">
+          <div class="board-header">
+            <h2>Repair Queue</h2>
+            <span class="board-count" data-role="queue-count">0</span>
+          </div>
+          <ul class="card-list" data-role="queue-list"></ul>
+        </div>
+
+        <div class="board">
+          <div class="board-header">
+            <h2>Repairers at Work</h2>
+            <span class="board-count" data-role="repairing-count">0</span>
+          </div>
+          <ul class="card-list" data-role="repairing-list"></ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <p class="status" data-role="status-text">Connecting…</p>
+        <p class="timestamp" data-role="timestamp-text"></p>
+        <button class="theme-toggle" type="button" data-role="theme-toggle">
+          Switch theme
+        </button>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+
