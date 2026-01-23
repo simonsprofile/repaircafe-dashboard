@@ -1,15 +1,6 @@
 const CONFIG = {
   title: "Nunhead Repair Café",
-  logoUrl:
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(
-      `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-        <rect width="64" height="64" rx="16" fill="#0b5f5a"/>
-        <path d="M18 44h28v4H18zM22 18h20v16H22z" fill="#ffffff"/>
-        <path d="M26 22h12v8H26z" fill="#0b5f5a"/>
-        <circle cx="48" cy="22" r="6" fill="#ffffff"/>
-      </svg>`
-    ),
+  logoUrl: "",
   endpoints: [
     "https://script.google.com/macros/s/AKfycbx8V-lwZMv0QUt5cRmxiKW17i1lCQtr9HKWYgXZzrSI7xTp4XZDsHX7UpRXxArUCh0s/exec",
     "https://script.googleusercontent.com/a/macros/sitechindustries.com/echo?user_content_key=AehSKLhBmY7eFa0sncM8k2Lhab4-KfNkfsGvmnf-MrhYQgV4CDh0g-7_svTEKvzxhIWr2ZT76Uy0JvaB5qA6rp9NYt7hd7G7zT6X_b0rnJfiPzaDvclLikFpfQB1TU9spTjmcsdKaH6DWKBoG6TkZqbZBk8F8xuA6hCAgTxRtaP2pCyJ7kVKin3vvGj7VMLxxq4zFUjiEkOa-K8cJbTQ8ENzqMR8BypH8pBKVOmG2U6QzKVv19kqSP3EiygZ_3KH_vZRIu8k5wYleHya-YmMV7LJMhnDGRDypQf-U5iPtGNhMyTm6ehRt77Tja3ScP4MWw&lib=MYMr4yAGcl7U7jXkvQkA424v0J4XZf0PJ",
@@ -21,12 +12,15 @@ const CONFIG = {
 const elements = {
   title: document.querySelector("[data-role='title']"),
   logo: document.querySelector(".logo"),
+  logoIcon: document.querySelector("[data-role='logo-icon']"),
   repairedCount: document.querySelector("[data-role='repaired-count']"),
   queueList: document.querySelector("[data-role='queue-list']"),
   queueCount: document.querySelector("[data-role='queue-count']"),
   repairingList: document.querySelector("[data-role='repairing-list']"),
   repairingCount: document.querySelector("[data-role='repairing-count']"),
-  status: document.querySelector("[data-role='status-text']"),
+  status: document.querySelector("[data-role='status']"),
+  statusText: document.querySelector("[data-role='status-text']"),
+  statusSpinner: document.querySelector("[data-role='status-spinner']"),
   timestamp: document.querySelector("[data-role='timestamp-text']"),
   themeToggle: document.querySelector("[data-role='theme-toggle']"),
 };
@@ -97,6 +91,43 @@ const relativeLuminance = ({ r, g, b }) => {
   const gLin = toLinear(g);
   const bLin = toLinear(b);
   return 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin;
+};
+
+const contrastRatio = (rgbA, rgbB) => {
+  const lumA = relativeLuminance(rgbA) + 0.05;
+  const lumB = relativeLuminance(rgbB) + 0.05;
+  return lumA > lumB ? lumA / lumB : lumB / lumA;
+};
+
+const ensureContrastLightness = (hue, saturation, lightness, againstRgb, min) => {
+  let bestLightness = lightness;
+  let bestRatio = contrastRatio(hslToRgb(hue, saturation, lightness), againstRgb);
+
+  for (let step = 4; step <= 32; step += 4) {
+    const darker = clamp(lightness - step, 8, 92);
+    const lighter = clamp(lightness + step, 8, 92);
+    const darkerRatio = contrastRatio(
+      hslToRgb(hue, saturation, darker),
+      againstRgb
+    );
+    const lighterRatio = contrastRatio(
+      hslToRgb(hue, saturation, lighter),
+      againstRgb
+    );
+    if (darkerRatio > bestRatio) {
+      bestRatio = darkerRatio;
+      bestLightness = darker;
+    }
+    if (lighterRatio > bestRatio) {
+      bestRatio = lighterRatio;
+      bestLightness = lighter;
+    }
+    if (bestRatio >= min) {
+      break;
+    }
+  }
+
+  return bestLightness;
 };
 
 const getReadableInk = (rgb) =>
@@ -184,19 +215,62 @@ const buildRandomPalette = () => {
   }
   const accent2Hue = (baseHue + 240) % 360;
 
-  const bg = hsl(baseHue, randomBetween(20, 35), randomBetween(88, 93));
+  const bgH = baseHue;
+  const bgS = randomBetween(20, 35);
+  const bgL = randomBetween(88, 93);
+  const bg = hsl(bgH, bgS, bgL);
+  const bgRgb = hslToRgb(bgH, bgS, bgL);
+
   const bgAccent = hsl(baseHue, randomBetween(30, 45), randomBetween(80, 86));
   const bgAccent2 = hsl(accentHue, randomBetween(30, 50), randomBetween(75, 82));
 
-  const card = hsl(baseHue, randomBetween(15, 25), randomBetween(94, 97));
+  const cardH = baseHue;
+  const cardS = randomBetween(15, 25);
+  const cardL = randomBetween(94, 97);
+  const card = hsl(cardH, cardS, cardL);
+  const cardRgb = hslToRgb(cardH, cardS, cardL);
   const cardAccent = hsl(accentHue, randomBetween(30, 50), randomBetween(80, 88));
   const cardAlt = hsl(accent2Hue, randomBetween(25, 40), randomBetween(90, 94));
 
-  const accent = hsl(accentHue, randomBetween(70, 90), randomBetween(42, 55));
-  const accent2 = hsl(accent2Hue, randomBetween(70, 90), randomBetween(45, 58));
+  const accentS = randomBetween(75, 90);
+  const accentLBase = randomBetween(32, 45);
+  const accentL = ensureContrastLightness(
+    accentHue,
+    accentS,
+    accentLBase,
+    cardRgb,
+    3.2
+  );
+  const accent = hsl(accentHue, accentS, accentL);
 
-  const ink = hsl(baseHue, randomBetween(10, 18), randomBetween(14, 20));
-  const muted = hsl(baseHue, randomBetween(8, 14), randomBetween(35, 45));
+  const accent2S = randomBetween(75, 90);
+  const accent2LBase = randomBetween(34, 48);
+  const accent2L = ensureContrastLightness(
+    accent2Hue,
+    accent2S,
+    accent2LBase,
+    cardRgb,
+    3.2
+  );
+  const accent2 = hsl(accent2Hue, accent2S, accent2L);
+
+  const ink = hsl(baseHue, randomBetween(10, 18), randomBetween(12, 18));
+  const muted = hsl(baseHue, randomBetween(8, 14), randomBetween(32, 42));
+
+  const statusQueueL = ensureContrastLightness(
+    accentHue,
+    85,
+    40,
+    cardRgb,
+    3.6
+  );
+  const statusRepairingL = ensureContrastLightness(
+    accent2Hue,
+    85,
+    40,
+    cardRgb,
+    3.6
+  );
 
   return {
     "--bg": bg,
@@ -220,8 +294,8 @@ const buildRandomPalette = () => {
     "--pill-ink": hsl(accentHue, 40, 30),
     "--pill-status-bg": hsla(accent2Hue, 70, 55, 0.25),
     "--pill-status-ink": hsl(accent2Hue, 45, 30),
-    "--status-queue": hsl(accentHue, 85, 50),
-    "--status-repairing": hsl(accent2Hue, 85, 50),
+    "--status-queue": hsl(accentHue, 85, statusQueueL),
+    "--status-repairing": hsl(accent2Hue, 85, statusRepairingL),
   };
 };
 
@@ -237,9 +311,27 @@ const clearThemeVariables = () => {
   });
 };
 
-const setStatus = (message, isError = false) => {
-  elements.status.textContent = message;
-  elements.status.classList.toggle("status-error", isError);
+const setStatus = (state, message = "") => {
+  if (!elements.status) {
+    return;
+  }
+  elements.status.classList.remove("is-loading", "is-hidden");
+  if (elements.statusText) {
+    elements.statusText.textContent = "";
+  }
+  if (state === "loading") {
+    elements.status.classList.add("is-loading");
+    elements.status.setAttribute("aria-label", "Updating");
+    return;
+  }
+  if (state === "error") {
+    elements.status.setAttribute("aria-label", "Connection issue");
+    if (elements.statusText) {
+      elements.statusText.textContent = message;
+    }
+    return;
+  }
+  elements.status.classList.add("is-hidden");
 };
 
 const formatTime = (date) =>
@@ -306,9 +398,12 @@ const buildRepairingCard = (ticket) => {
   const itemName = ticket.item || "Untitled item";
   const ownerName = ticket.owner || "Unknown";
   item.innerHTML = `
-    <p class="card-title">
-      <span class="card-strong">${itemName}</span><span class="card-soft">brought by</span><span class="card-strong">${ownerName}</span>
-    </p>
+    <div class="card-head">
+      <p class="card-title">
+        <span class="card-strong">${itemName}</span><span class="card-soft">brought by</span><span class="card-strong">${ownerName}</span>
+      </p>
+      <span class="pill pill-status">Repairing</span>
+    </div>
     <span class="pill">Repairer: <strong>${
       ticket.mender || "Unassigned"
     }</strong></span>
@@ -363,7 +458,7 @@ const fetchData = async () => {
   }
   state.isFetching = true;
   try {
-    setStatus("Updating…");
+    setStatus("loading");
     const endpoints = Array.isArray(CONFIG.endpoints)
       ? CONFIG.endpoints
       : [CONFIG.endpoint];
@@ -384,7 +479,7 @@ const fetchData = async () => {
     state.lastPayload = payload;
     state.lastUpdated = new Date();
     renderDashboard(payload);
-    setStatus("Live");
+    setStatus("idle");
     elements.timestamp.textContent = `Last updated ${formatTime(
       state.lastUpdated
     )}`;
@@ -393,7 +488,7 @@ const fetchData = async () => {
       error instanceof Error
         ? `Connection issue (${error.message}) — showing last update.`
         : "Connection issue — showing last update.";
-    setStatus(message, true);
+    setStatus("error", message);
     if (state.lastPayload) {
       renderDashboard(state.lastPayload);
     }
@@ -404,8 +499,19 @@ const fetchData = async () => {
 
 const init = () => {
   elements.title.textContent = CONFIG.title;
-  elements.logo.src = CONFIG.logoUrl;
-  elements.logo.alt = `${CONFIG.title} logo`;
+  if (CONFIG.logoUrl) {
+    elements.logo.src = CONFIG.logoUrl;
+    elements.logo.alt = `${CONFIG.title} logo`;
+    elements.logo.style.display = "block";
+    if (elements.logoIcon) {
+      elements.logoIcon.style.display = "none";
+    }
+  } else {
+    elements.logo.style.display = "none";
+    if (elements.logoIcon) {
+      elements.logoIcon.style.display = "grid";
+    }
+  }
   const applyTheme = () => {
     document.body.dataset.theme = "random-contrast";
     applyThemeVariables(buildRandomPalette());
