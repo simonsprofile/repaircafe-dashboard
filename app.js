@@ -404,7 +404,7 @@ const buildRepairingCard = (ticket) => {
       </p>
       <span class="pill pill-status">Repairing</span>
     </div>
-    <span class="pill">Repairer: <strong>${
+    <span class="pill">Mender: <strong>${
       ticket.mender || "Unassigned"
     }</strong></span>
   `;
