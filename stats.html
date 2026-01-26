@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nunhead Repair Café — Stats</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=bar_chart,checklist,handyman,palette"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-action="closed_repairs">
+    <main class="app">
+      <header class="header">
+        <div class="brand">
+          <img class="logo" src="" alt="Nunhead Repair Café logo" />
+          <span class="material-symbols-outlined logo-icon" data-role="logo-icon"
+            >handyman</span
+          >
+          <div class="brand-text">
+            <p class="brand-eyebrow">Statistics for</p>
+            <h1 class="brand-title" data-role="title">Nunhead Repair Café</h1>
+          </div>
+        </div>
+        <div class="date-range">
+          <p class="stat-label">Date range</p>
+          <div class="date-range-fields">
+            <label class="date-field">
+              <span>From</span>
+              <input type="date" data-role="stats-start" />
+            </label>
+            <label class="date-field">
+              <span>To</span>
+              <input type="date" data-role="stats-end" />
+            </label>
+          </div>
+        </div>
+      </header>
+
+      <section class="boards is-stats">
+        <div class="board board-full board-scorecard">
+          <div class="board-header">
+            <h2>Scorecard</h2>
+          </div>
+          <div class="scorecard-grid">
+            <div class="card scorecard scorecard-full">
+              <div class="score score-highlight">
+                <p class="score-label">Successful Repairs</p>
+                <p class="score-value" data-role="stats-success">0</p>
+              </div>
+            </div>
+            <div class="card scorecard">
+              <div class="score score-pending">
+                <p class="score-label">Pending Repairs</p>
+                <p class="score-value" data-role="stats-pending">0</p>
+              </div>
+            </div>
+            <div class="card scorecard">
+              <div class="score score-failed">
+                <p class="score-label">Failed Repairs</p>
+                <p class="score-value" data-role="stats-failed">0</p>
+              </div>
+            </div>
+          </div>
+          <div class="card scorecard-aux">
+            <div class="score">
+              <p class="score-label">Average Wait Time</p>
+              <p class="score-value" data-role="stats-avg-wait">—</p>
+            </div>
+            <div class="score">
+              <p class="score-label">Average Repair Time</p>
+              <p class="score-value" data-role="stats-avg-repair">—</p>
+            </div>
+            <div class="score">
+              <p class="score-label">Average Visits</p>
+              <p class="score-value" data-role="stats-avg-visits">—</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="board">
+          <div class="board-header">
+            <h2>Podiums</h2>
+          </div>
+          <div class="podium-grid">
+            <p class="podium-group">Mender Podiums</p>
+            <div class="card">
+              <p class="card-title">Fastest Mender</p>
+              <div class="podium">
+                <div class="podium-slot podium-second" data-role="podium-fast-2">
+                  <p class="podium-rank">2</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div class="podium-slot podium-first" data-role="podium-fast-1">
+                  <p class="podium-rank">1</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div class="podium-slot podium-third" data-role="podium-fast-3">
+                  <p class="podium-rank">3</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="card-title">Most Thorough Mender</p>
+              <div class="podium">
+                <div
+                  class="podium-slot podium-second"
+                  data-role="podium-thorough-2"
+                >
+                  <p class="podium-rank">2</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-first"
+                  data-role="podium-thorough-1"
+                >
+                  <p class="podium-rank">1</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-third"
+                  data-role="podium-thorough-3"
+                >
+                  <p class="podium-rank">3</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="card-title">Most Successful Mender</p>
+              <div class="podium">
+                <div
+                  class="podium-slot podium-second"
+                  data-role="podium-success-2"
+                >
+                  <p class="podium-rank">2</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-first"
+                  data-role="podium-success-1"
+                >
+                  <p class="podium-rank">1</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-third"
+                  data-role="podium-success-3"
+                >
+                  <p class="podium-rank">3</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+              </div>
+            </div>
+
+            <p class="podium-group">Café Podiums</p>
+            <div class="card">
+              <p class="card-title">Most Successful Café</p>
+              <div class="podium">
+                <div
+                  class="podium-slot podium-second"
+                  data-role="podium-cafe-2"
+                >
+                  <p class="podium-rank">2</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-first"
+                  data-role="podium-cafe-1"
+                >
+                  <p class="podium-rank">1</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-third"
+                  data-role="podium-cafe-3"
+                >
+                  <p class="podium-rank">3</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <p class="card-title">Busiest Café</p>
+              <div class="podium">
+                <div
+                  class="podium-slot podium-second"
+                  data-role="podium-busy-2"
+                >
+                  <p class="podium-rank">2</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-first"
+                  data-role="podium-busy-1"
+                >
+                  <p class="podium-rank">1</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+                <div
+                  class="podium-slot podium-third"
+                  data-role="podium-busy-3"
+                >
+                  <p class="podium-rank">3</p>
+                  <p class="podium-name">—</p>
+                  <p class="podium-value">—</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="board">
+          <div class="board-header">
+            <h2>Splits</h2>
+          </div>
+          <div class="splits-grid">
+            <div class="card card-strong-title">
+              <p class="card-title">Success Rate</p>
+              <div class="splits-card">
+                <div class="pie">
+                  <canvas
+                    data-role="status-chart"
+                    aria-label="Status pie"
+                  ></canvas>
+                </div>
+                <div class="legend" data-role="status-legend"></div>
+              </div>
+            </div>
+
+            <div class="card card-strong-title">
+              <p class="card-title">Repair Type</p>
+              <div class="splits-card">
+                <div class="pie">
+                  <canvas
+                    data-role="repair-type-chart"
+                    aria-label="Repair type pie"
+                  ></canvas>
+                </div>
+                <div class="legend" data-role="repair-type-legend"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="footer-left">
+          <p class="timestamp" data-role="timestamp-text"></p>
+          <div class="status is-hidden" data-role="status" role="status">
+            <span
+              class="spinner"
+              data-role="status-spinner"
+              aria-hidden="true"
+            ></span>
+            <span class="status-text" data-role="status-text"></span>
+          </div>
+        </div>
+        <a
+          class="footer-centre"
+          href="https://sitechindustries.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <p class="footer-label">Powered by</p>
+          <img
+            class="footer-logo"
+            src="dark_sparse_long_250.png"
+            alt="Powered by logo"
+          />
+        </a>
+        <div class="footer-actions">
+          <a
+            class="footer-action"
+            href="index.html"
+            aria-label="View dashboard"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >checklist</span
+            >
+          </a>
+          <button
+            class="theme-toggle footer-action"
+            type="button"
+            data-role="theme-toggle"
+            aria-label="Randomise theme"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true"
+              >palette</span
+            >
+          </button>
+        </div>
+      </footer>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

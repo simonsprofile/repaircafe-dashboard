@@ -1,10 +1,8 @@
 const CONFIG = {
   title: "Nunhead Repair Café",
   logoUrl: "",
-  endpoints: [
-    "https://script.google.com/macros/s/AKfycbx8V-lwZMv0QUt5cRmxiKW17i1lCQtr9HKWYgXZzrSI7xTp4XZDsHX7UpRXxArUCh0s/exec",
-    "https://script.googleusercontent.com/a/macros/sitechindustries.com/echo?user_content_key=AehSKLhBmY7eFa0sncM8k2Lhab4-KfNkfsGvmnf-MrhYQgV4CDh0g-7_svTEKvzxhIWr2ZT76Uy0JvaB5qA6rp9NYt7hd7G7zT6X_b0rnJfiPzaDvclLikFpfQB1TU9spTjmcsdKaH6DWKBoG6TkZqbZBk8F8xuA6hCAgTxRtaP2pCyJ7kVKin3vvGj7VMLxxq4zFUjiEkOa-K8cJbTQ8ENzqMR8BypH8pBKVOmG2U6QzKVv19kqSP3EiygZ_3KH_vZRIu8k5wYleHya-YmMV7LJMhnDGRDypQf-U5iPtGNhMyTm6ehRt77Tja3ScP4MWw&lib=MYMr4yAGcl7U7jXkvQkA424v0J4XZf0PJ",
-  ],
+  endpoint:
+    "https://script.google.com/macros/s/AKfycbz3cVv4oZkfBiX550T8fW0nC1tHxH4tyEc9Bv4KnOqnzFUkX8FhhMCDtpSCYZ0i4vly/exec",
   pollIntervalMs: 10000,
   requestTimeoutMs: 20000,
 };
@@ -18,6 +16,45 @@ const elements = {
   queueCount: document.querySelector("[data-role='queue-count']"),
   repairingList: document.querySelector("[data-role='repairing-list']"),
   repairingCount: document.querySelector("[data-role='repairing-count']"),
+  statsCount: document.querySelector("[data-role='stats-count']"),
+  statsList: document.querySelector("[data-role='stats-list']"),
+  statsStart: document.querySelector("[data-role='stats-start']"),
+  statsEnd: document.querySelector("[data-role='stats-end']"),
+  statsSuccess: document.querySelector("[data-role='stats-success']"),
+  statsPending: document.querySelector("[data-role='stats-pending']"),
+  statsFailed: document.querySelector("[data-role='stats-failed']"),
+  statsAvgWait: document.querySelector("[data-role='stats-avg-wait']"),
+  statsAvgRepair: document.querySelector("[data-role='stats-avg-repair']"),
+  statsAvgVisits: document.querySelector("[data-role='stats-avg-visits']"),
+  statusChart: document.querySelector("[data-role='status-chart']"),
+  statusLegend: document.querySelector("[data-role='status-legend']"),
+  repairTypeChart: document.querySelector("[data-role='repair-type-chart']"),
+  repairTypeLegend: document.querySelector("[data-role='repair-type-legend']"),
+  podiumFast: [
+    document.querySelector("[data-role='podium-fast-1']"),
+    document.querySelector("[data-role='podium-fast-2']"),
+    document.querySelector("[data-role='podium-fast-3']"),
+  ],
+  podiumThorough: [
+    document.querySelector("[data-role='podium-thorough-1']"),
+    document.querySelector("[data-role='podium-thorough-2']"),
+    document.querySelector("[data-role='podium-thorough-3']"),
+  ],
+  podiumSuccess: [
+    document.querySelector("[data-role='podium-success-1']"),
+    document.querySelector("[data-role='podium-success-2']"),
+    document.querySelector("[data-role='podium-success-3']"),
+  ],
+  podiumCafe: [
+    document.querySelector("[data-role='podium-cafe-1']"),
+    document.querySelector("[data-role='podium-cafe-2']"),
+    document.querySelector("[data-role='podium-cafe-3']"),
+  ],
+  podiumBusy: [
+    document.querySelector("[data-role='podium-busy-1']"),
+    document.querySelector("[data-role='podium-busy-2']"),
+    document.querySelector("[data-role='podium-busy-3']"),
+  ],
   status: document.querySelector("[data-role='status']"),
   statusText: document.querySelector("[data-role='status-text']"),
   statusSpinner: document.querySelector("[data-role='status-spinner']"),
@@ -77,6 +114,23 @@ const hslToRgb = (hue, saturation, lightness) => {
     r: Math.round((r + m) * 255),
     g: Math.round((g + m) * 255),
     b: Math.round((b + m) * 255),
+  };
+};
+
+const parseHslString = (value) => {
+  if (!value) {
+    return null;
+  }
+  const match = value
+    .trim()
+    .match(/hsla?\(([\d.]+)[ ,]+([\d.]+)%[ ,]+([\d.]+)%/i);
+  if (!match) {
+    return null;
+  }
+  return {
+    h: Number(match[1]),
+    s: Number(match[2]),
+    l: Number(match[3]),
   };
 };
 
@@ -166,6 +220,8 @@ const THEME_VARS = [
   "--card-alt",
   "--card-alt-2",
   "--ink",
+  "--ink-soft",
+  "--score-soft",
   "--muted",
   "--accent",
   "--accent-2",
@@ -255,7 +311,27 @@ const buildRandomPalette = () => {
   const accent2 = hsl(accent2Hue, accent2S, accent2L);
 
   const ink = hsl(baseHue, randomBetween(10, 18), randomBetween(12, 18));
+  const inkSoftS = randomBetween(4, 10);
+  const inkSoftLBase = randomBetween(40, 48);
+  const inkSoftL = ensureContrastLightness(
+    baseHue,
+    inkSoftS,
+    inkSoftLBase,
+    cardRgb,
+    2.6
+  );
+  const inkSoft = hsl(baseHue, inkSoftS, inkSoftL);
   const muted = hsl(baseHue, randomBetween(8, 14), randomBetween(32, 42));
+  const scoreSoftS = randomBetween(10, 18);
+  const scoreSoftLBase = randomBetween(66, 74);
+  const scoreSoftL = ensureContrastLightness(
+    accentHue,
+    scoreSoftS,
+    scoreSoftLBase,
+    cardRgb,
+    2.4
+  );
+  const scoreSoft = hsl(accentHue, scoreSoftS, scoreSoftL);
 
   const statusQueueL = ensureContrastLightness(
     accentHue,
@@ -281,6 +357,8 @@ const buildRandomPalette = () => {
     "--card-alt": cardAlt,
     "--card-alt-2": cardAlt,
     "--ink": ink,
+    "--ink-soft": inkSoft,
+    "--score-soft": scoreSoft,
     "--muted": muted,
     "--accent": accent,
     "--accent-2": accent2,
@@ -412,6 +490,9 @@ const buildRepairingCard = (ticket) => {
 };
 
 const renderDashboard = (payload) => {
+  if (!elements.queueList || !elements.repairingList) {
+    return;
+  }
   const active = Array.isArray(payload.active) ? payload.active : [];
   const queue = active.filter(
     (ticket) => normaliseStatus(ticket.status) === "queueing"
@@ -420,26 +501,604 @@ const renderDashboard = (payload) => {
     (ticket) => normaliseStatus(ticket.status) === "repairing"
   );
 
-  elements.repairedCount.textContent = payload.stats?.repairedToday ?? 0;
-  elements.queueCount.textContent = queue.length;
-  elements.repairingCount.textContent = repairing.length;
+  if (elements.repairedCount) {
+    elements.repairedCount.textContent = payload.stats?.repairedToday ?? 0;
+  }
+  if (elements.queueCount) {
+    elements.queueCount.textContent = queue.length;
+  }
+  if (elements.repairingCount) {
+    elements.repairingCount.textContent = repairing.length;
+  }
 
   renderCards(elements.queueList, queue, buildQueueCard);
   renderCards(elements.repairingList, repairing, buildRepairingCard);
 };
 
-const buildUrl = (endpoint) => {
+const renderStats = (payload) => {
+  if (
+    !elements.statsSuccess ||
+    !elements.statsPending ||
+    !elements.statsFailed ||
+    !elements.statsAvgWait ||
+    !elements.statsAvgRepair ||
+    !elements.statsAvgVisits
+  ) {
+    return;
+  }
+  const closed = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload.closed)
+    ? payload.closed
+    : Array.isArray(payload.repairs)
+    ? payload.repairs
+    : Array.isArray(payload.items)
+    ? payload.items
+    : [];
+  const range = getStatsRange();
+  const completedItems = filterByDate(
+    closed,
+    (item) => item?.repairCompleted,
+    range
+  );
+  const counts = completedItems.reduce(
+    (acc, item) => {
+      const status = normaliseStatus(item.status);
+      if (status === "repaired") {
+        acc.success += 1;
+      } else if (status === "pending") {
+        acc.pending += 1;
+      } else if (status === "failed") {
+        acc.failed += 1;
+      }
+      return acc;
+    },
+    { success: 0, pending: 0, failed: 0 }
+  );
+  elements.statsSuccess.textContent = counts.success;
+  elements.statsPending.textContent = counts.pending;
+  elements.statsFailed.textContent = counts.failed;
+
+  const average = (values) =>
+    values.length
+      ? values.reduce((sum, value) => sum + value, 0) / values.length
+      : 0;
+  const avgQueue = average(
+    completedItems
+      .map((item) => item?.totalQueueTime)
+      .filter((value) => typeof value === "number" && value >= 0)
+  );
+  const avgRepair = average(
+    completedItems
+      .map((item) => item?.totalRepairTime)
+      .filter((value) => typeof value === "number" && value >= 0)
+  );
+  const visitValues = completedItems
+    .map((item) => item?.visits)
+    .filter((value) => typeof value === "number" && value >= 0);
+  let avgVisits = 0;
+  if (visitValues.length) {
+    avgVisits = average(visitValues);
+  } else {
+    const arrivalItems = filterByDate(
+      closed,
+      (item) => item?.arrival,
+      range
+    );
+    if (range) {
+      const dayMs = 24 * 60 * 60 * 1000;
+      const dayCount =
+        Math.floor((range.end.getTime() - range.start.getTime()) / dayMs) + 1;
+      avgVisits = dayCount > 0 ? arrivalItems.length / dayCount : 0;
+    } else {
+      const byDay = new Map();
+      arrivalItems.forEach((item) => {
+        const date = new Date(item.arrival);
+        if (Number.isNaN(date.getTime())) {
+          return;
+        }
+        const key = toDateKey(date);
+        byDay.set(key, (byDay.get(key) || 0) + 1);
+      });
+      const dayCounts = Array.from(byDay.values());
+      avgVisits = average(dayCounts);
+    }
+  }
+  const formatAvgCount = (value) => {
+    if (!Number.isFinite(value)) {
+      return "—";
+    }
+    const rounded = Math.round(value * 10) / 10;
+    return Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+  };
+  elements.statsAvgWait.textContent = formatDuration(avgQueue);
+  elements.statsAvgRepair.textContent = formatDuration(avgRepair);
+  elements.statsAvgVisits.textContent = formatAvgCount(avgVisits);
+
+  renderStatusChart(counts);
+  renderRepairTypeChart(completedItems);
+  renderPodiums(completedItems, closed, range);
+};
+
+const formatDuration = (seconds) => {
+  if (typeof seconds !== "number" || Number.isNaN(seconds) || seconds < 0) {
+    return "—";
+  }
+  const totalMinutes = Math.round(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) {
+    return `${String(minutes).padStart(2, "0")}m`;
+  }
+  return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+};
+
+const buildPodiumEntry = (slot, name, value) => {
+  if (!slot) {
+    return;
+  }
+  const nameEl = slot.querySelector(".podium-name");
+  const valueEl = slot.querySelector(".podium-value");
+  if (nameEl) {
+    nameEl.textContent = name || "—";
+  }
+  if (valueEl) {
+    valueEl.textContent = value || "—";
+  }
+};
+
+const renderPodium = (slots, entries, formatter) => {
+  if (!Array.isArray(slots)) {
+    return;
+  }
+  const [first, second, third] = slots;
+  buildPodiumEntry(first, entries[0]?.name, formatter(entries[0]));
+  buildPodiumEntry(second, entries[1]?.name, formatter(entries[1]));
+  buildPodiumEntry(third, entries[2]?.name, formatter(entries[2]));
+};
+
+const toDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateLabel = (date) =>
+  date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+const filterByDate = (items, accessor, range) => {
+  const filtered = [];
+  items.forEach((item) => {
+    const raw = accessor(item);
+    if (!raw) {
+      return;
+    }
+    const date = new Date(raw);
+    if (Number.isNaN(date.getTime())) {
+      return;
+    }
+    if (range && (date < range.start || date > range.end)) {
+      return;
+    }
+    filtered.push(item);
+  });
+  return filtered;
+};
+
+const renderPodiums = (completedItems, allItems, range) => {
+  const byMender = new Map();
+  completedItems.forEach((item) => {
+    if (!Array.isArray(item.mender) || item.mender.length === 0) {
+      return;
+    }
+    if (typeof item.totalRepairTime !== "number") {
+      return;
+    }
+    item.mender.forEach((name) => {
+      if (!name) {
+        return;
+      }
+      const entry = byMender.get(name) || { total: 0, count: 0 };
+      entry.total += item.totalRepairTime;
+      entry.count += 1;
+      byMender.set(name, entry);
+    });
+  });
+
+  const menderAverages = Array.from(byMender.entries())
+    .map(([name, entry]) => ({
+      name,
+      average: entry.count ? entry.total / entry.count : null,
+    }))
+    .filter((entry) => typeof entry.average === "number");
+
+  const fastest = [...menderAverages].sort((a, b) => a.average - b.average).slice(0, 3);
+  const slowest = [...menderAverages].sort((a, b) => b.average - a.average).slice(0, 3);
+
+  renderPodium(elements.podiumFast, fastest, (entry) =>
+    entry ? formatDuration(entry.average) : "—"
+  );
+  renderPodium(elements.podiumThorough, slowest, (entry) =>
+    entry ? formatDuration(entry.average) : "—"
+  );
+
+  const successfulByMender = new Map();
+  completedItems.forEach((item) => {
+    if (normaliseStatus(item.status) !== "repaired") {
+      return;
+    }
+    if (!Array.isArray(item.mender) || item.mender.length === 0) {
+      return;
+    }
+    item.mender.forEach((name) => {
+      if (!name) {
+        return;
+      }
+      successfulByMender.set(name, (successfulByMender.get(name) || 0) + 1);
+    });
+  });
+
+  const mostSuccessful = Array.from(successfulByMender.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+
+  renderPodium(elements.podiumSuccess, mostSuccessful, (entry) =>
+    entry ? `${entry.count} repairs` : "—"
+  );
+
+  const completedSuccess = completedItems.filter(
+    (item) => normaliseStatus(item.status) === "repaired"
+  );
+  const byCompletedDay = new Map();
+  completedSuccess.forEach((item) => {
+    const date = new Date(item.repairCompleted);
+    if (Number.isNaN(date.getTime())) {
+      return;
+    }
+    const key = toDateKey(date);
+    byCompletedDay.set(key, (byCompletedDay.get(key) || 0) + 1);
+  });
+
+  const topDays = Array.from(byCompletedDay.entries())
+    .map(([key, count]) => ({
+      name: formatDateLabel(new Date(`${key}T00:00:00`)),
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+
+  renderPodium(elements.podiumCafe, topDays, (entry) =>
+    entry ? `${entry.count} repairs` : "—"
+  );
+
+  const arrivalItems = filterByDate(allItems, (item) => item?.arrival, range);
+  const byArrivalDay = new Map();
+  arrivalItems.forEach((item) => {
+    const date = new Date(item.arrival);
+    if (Number.isNaN(date.getTime())) {
+      return;
+    }
+    const key = toDateKey(date);
+    byArrivalDay.set(key, (byArrivalDay.get(key) || 0) + 1);
+  });
+
+  const busiest = Array.from(byArrivalDay.entries())
+    .map(([key, count]) => ({
+      name: formatDateLabel(new Date(`${key}T00:00:00`)),
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+
+  renderPodium(elements.podiumBusy, busiest, (entry) =>
+    entry ? `${entry.count} repairs` : "—"
+  );
+};
+
+const chartState = {
+  status: null,
+  repairType: null,
+};
+
+const buildStatusColors = () => [
+  getComputedStyle(document.body).getPropertyValue("--success-color").trim() ||
+    "#1b8f4a",
+  getComputedStyle(document.body).getPropertyValue("--error-color").trim() ||
+    "#b91c1c",
+  getComputedStyle(document.body).getPropertyValue("--warning-color").trim() ||
+    "#d97706",
+];
+
+const ensureStatusChart = () => {
+  if (!elements.statusChart || typeof Chart === "undefined") {
+    return null;
+  }
+  if (chartState.status) {
+    return chartState.status;
+  }
+  const ctx = elements.statusChart.getContext("2d");
+  chartState.status = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Repaired", "Failed", "Pending"],
+      datasets: [
+        {
+          data: [0, 0, 0],
+          backgroundColor: buildStatusColors(),
+          borderColor: "transparent",
+          borderWidth: 0,
+          spacing: 6,
+          borderRadius: 6,
+          hoverOffset: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "42%",
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) => {
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((sum, v) => sum + v, 0);
+              const percent = total ? Math.round((value / total) * 100) : 0;
+              return `${context.label}: ${percent}% (${value})`;
+            },
+          },
+        },
+      },
+    },
+    plugins: [
+      {
+        id: "sliceLabels",
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          const dataset = chart.data.datasets[0];
+          const meta = chart.getDatasetMeta(0);
+          const total = dataset.data.reduce((sum, v) => sum + v, 0);
+          ctx.save();
+          ctx.fillStyle = getComputedStyle(document.body)
+            .getPropertyValue("--ink")
+            .trim();
+          ctx.font = "700 12px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          meta.data.forEach((arc, index) => {
+            const value = dataset.data[index];
+            if (!total || !value) {
+              return;
+            }
+            const percent = Math.round((value / total) * 100);
+            if (percent < 6) {
+              return;
+            }
+            const { x, y } = arc.getCenterPoint();
+            ctx.fillText(`${percent}%`, x, y);
+          });
+          ctx.restore();
+        },
+      },
+    ],
+  });
+  return chartState.status;
+};
+
+const renderStatusChart = (counts) => {
+  if (!elements.statusChart || !elements.statusLegend) {
+    return;
+  }
+  const chart = ensureStatusChart();
+  if (!chart) {
+    return;
+  }
+  const colors = buildStatusColors();
+  chart.data.datasets[0].data = [
+    counts.success,
+    counts.failed,
+    counts.pending,
+  ];
+  chart.data.datasets[0].backgroundColor = colors;
+  chart.update();
+
+  const labels = ["Repaired", "Failed", "Pending"];
+  const values = [counts.success, counts.failed, counts.pending];
+  elements.statusLegend.innerHTML = labels
+    .map(
+      (label, index) => `
+        <div class="legend-item">
+          <span class="legend-swatch" style="--legend-color:${colors[index]}"></span>
+          <span>${label}</span>
+          <span class="legend-value">${values[index]}</span>
+        </div>
+      `
+    )
+    .join("");
+};
+
+const buildDerivedChartColors = (count) => {
+  const themeVars = [
+    "--accent",
+    "--accent-2",
+    "--bg-accent",
+    "--bg-accent-2",
+    "--card-accent",
+  ];
+  const baseColors = themeVars
+    .map((key) =>
+      parseHslString(getComputedStyle(document.body).getPropertyValue(key))
+    )
+    .filter(Boolean);
+  if (baseColors.length === 0) {
+    baseColors.push({ h: Math.random() * 360, s: 70, l: 55 });
+  }
+  return Array.from({ length: count }, (_, index) => {
+    const base = baseColors[index % baseColors.length];
+    const hue = (base.h + index * 37) % 360;
+    const saturation = clamp(base.s + randomBetween(-6, 12), 50, 82);
+    const lightness = clamp(base.l + randomBetween(-12, 8), 38, 68);
+    return hsl(hue, saturation, lightness);
+  });
+};
+
+const ensureRepairTypeChart = () => {
+  if (!elements.repairTypeChart || typeof Chart === "undefined") {
+    return null;
+  }
+  if (chartState.repairType) {
+    return chartState.repairType;
+  }
+  const ctx = elements.repairTypeChart.getContext("2d");
+  chartState.repairType = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: [],
+          borderColor: "transparent",
+          borderWidth: 0,
+          spacing: 6,
+          borderRadius: 6,
+          hoverOffset: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "42%",
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (context) =>
+              `${context.label}: ${context.raw || 0} repairs`,
+          },
+        },
+      },
+    },
+  });
+  return chartState.repairType;
+};
+
+const normaliseNeeds = (needs) => {
+  if (Array.isArray(needs)) {
+    return needs.map((need) => String(need || "").trim()).filter(Boolean);
+  }
+  if (typeof needs === "string") {
+    return needs
+      .split(",")
+      .map((need) => need.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const renderRepairTypeChart = (items) => {
+  if (!elements.repairTypeChart || !elements.repairTypeLegend) {
+    return;
+  }
+  const chart = ensureRepairTypeChart();
+  if (!chart) {
+    return;
+  }
+  const counts = new Map();
+  items.forEach((item) => {
+    normaliseNeeds(item?.needs).forEach((need) => {
+      counts.set(need, (counts.get(need) || 0) + 1);
+    });
+  });
+
+  const entries = Array.from(counts.entries())
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
+  const labels = entries.map((entry) => entry.label);
+  const values = entries.map((entry) => entry.value);
+  const colors = buildDerivedChartColors(labels.length);
+
+  chart.data.labels = labels;
+  chart.data.datasets[0].data = values;
+  chart.data.datasets[0].backgroundColor = colors;
+  chart.update();
+
+  if (labels.length === 0) {
+    elements.repairTypeLegend.innerHTML = `
+      <div class="legend-item">
+        <span>No data in range</span>
+      </div>
+    `;
+    return;
+  }
+
+  elements.repairTypeLegend.innerHTML = labels
+    .map(
+      (label, index) => `
+        <div class="legend-item">
+          <span class="legend-swatch" style="--legend-color:${colors[index]}"></span>
+          <span>${label}</span>
+          <span class="legend-value">${values[index]}</span>
+        </div>
+      `
+    )
+    .join("");
+};
+
+const pageAction = document.body.dataset.action || "open_repairs";
+const pollIntervalMs =
+  pageAction === "closed_repairs" ? 5 * 60 * 1000 : CONFIG.pollIntervalMs;
+
+const parseDateInput = (value) => {
+  if (!value) {
+    return null;
+  }
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) {
+    return null;
+  }
+  return new Date(year, month - 1, day);
+};
+
+const getStatsRange = () => {
+  if (!elements.statsStart || !elements.statsEnd) {
+    return null;
+  }
+  const start = parseDateInput(elements.statsStart.value);
+  const end = parseDateInput(elements.statsEnd.value);
+  if (!start || !end) {
+    return null;
+  }
+  const endOfDay = new Date(end);
+  endOfDay.setHours(23, 59, 59, 999);
+  return { start, end: endOfDay };
+};
+
+const buildUrl = (endpoint, action) => {
   const url = new URL(endpoint);
+  url.searchParams.set("action", action);
   url.searchParams.set("_", Date.now().toString());
   return url.toString();
 };
 
-const fetchFromEndpoint = async (endpoint, timeoutMs) => {
+const fetchFromEndpoint = async (endpoint, action, timeoutMs) => {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let response;
   try {
-    response = await fetch(buildUrl(endpoint), {
+    response = await fetch(buildUrl(endpoint, action), {
       cache: "no-store",
       signal: controller.signal,
     });
@@ -459,26 +1118,15 @@ const fetchData = async () => {
   state.isFetching = true;
   try {
     setStatus("loading");
-    const endpoints = Array.isArray(CONFIG.endpoints)
-      ? CONFIG.endpoints
-      : [CONFIG.endpoint];
-    let payload = null;
-    let lastError = null;
-    for (const endpoint of endpoints) {
-      try {
-        payload = await fetchFromEndpoint(endpoint, CONFIG.requestTimeoutMs);
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    if (!payload) {
-      throw lastError || new Error("No response");
-    }
+    const payload = await fetchFromEndpoint(
+      CONFIG.endpoint,
+      pageAction,
+      CONFIG.requestTimeoutMs
+    );
     state.lastPayload = payload;
     state.lastUpdated = new Date();
     renderDashboard(payload);
+    renderStats(payload);
     setStatus("idle");
     elements.timestamp.textContent = `Last updated ${formatTime(
       state.lastUpdated
@@ -491,10 +1139,18 @@ const fetchData = async () => {
     setStatus("error", message);
     if (state.lastPayload) {
       renderDashboard(state.lastPayload);
+      renderStats(state.lastPayload);
     }
   } finally {
     state.isFetching = false;
   }
+};
+
+const refreshCharts = () => {
+  if (!state.lastPayload) {
+    return;
+  }
+  renderStats(state.lastPayload);
 };
 
 const init = () => {
@@ -516,10 +1172,28 @@ const init = () => {
     document.body.dataset.theme = "random-contrast";
     applyThemeVariables(buildRandomPalette());
     if (elements.themeToggle) {
-      elements.themeToggle.textContent = "Randomise theme";
       elements.themeToggle.setAttribute("aria-label", "Randomise theme");
     }
+    refreshCharts();
   };
+  if (elements.statsStart && elements.statsEnd) {
+    const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    const toInputValue = (date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(date.getDate()).padStart(2, "0")}`;
+    elements.statsStart.value = toInputValue(startOfYear);
+    elements.statsEnd.value = toInputValue(today);
+    const handleRangeChange = () => {
+      if (state.lastPayload) {
+        renderStats(state.lastPayload);
+      }
+    };
+    elements.statsStart.addEventListener("change", handleRangeChange);
+    elements.statsEnd.addEventListener("change", handleRangeChange);
+  }
   if (elements.themeToggle) {
     elements.themeToggle.addEventListener("click", () => {
       applyTheme();
@@ -527,7 +1201,7 @@ const init = () => {
   }
   applyTheme();
   fetchData();
-  setInterval(fetchData, CONFIG.pollIntervalMs);
+  setInterval(fetchData, pollIntervalMs);
 };
 
 init();
