@@ -1,13 +1,13 @@
 # Nunhead Repair Café Dashboard
 
-A funky-lookin', zero-build dashboard system for repair cafés, displaying live repair queues and comprehensive historical statistics. If combined with a Google Sheet as a database, and an AppSheet app as an interface, the eco-system can manage Menders, Repairs, Events, Mailouts to Menders and Attendance. It's low-friction by design, minimising personal data collection and keeping GDPR compliance straightforward — no customer databases, no tracking cookies, just the essentials needed to fix things.
+A funky-lookin', zero-build dashboard system for repair cafés, displaying live repair queues and comprehensive historical statistics. If combined with a Google Sheet as a database, and an AppSheet app as an interface, the eco-system can manage Menders, Repairs, Events, Mailouts to Menders and Attendance. It's low-friction by design, minimising personal data collection and keeping GDPR compliance straightforward — customer data is not required, and anonymised quickly, just the essentials needed to fix things.
 
 ## Overview
 
 This project consists of two pages:
 
-- **`index.html`** — Live repair dashboard (Kanban-style view)
-- **`stats.html`** — Statistics and analytics page
+- **`index.html`** — Live public repair dashboard for event days
+- **`stats.html`** — Historical tatistics and analytics page
 
 Both share the same design system with a dynamic random-contrast theming engine and responsive layouts.
 
@@ -43,7 +43,8 @@ Both share the same design system with a dynamic random-contrast theming engine 
 - **Frontend**: Vanilla HTML/CSS/JS (zero build, fast, accessible)
 - **Charts**: Chart.js 4.4.3 (CDN, stats page only)
 - **Hosting**: GitHub Pages, Netlify, Cloudflare Pages, or any static host
-- **Data Source**: Google Apps Script web app
+- **Data Source**: Google Apps Script web app attached to a Google Sheet
+- **Data Interaction**: This repo is just a dashboard. There is an AppSheet app which acts as an electronic-Point-of-Repair interface and event management tool.
 
 ## Configuration
 
@@ -123,7 +124,7 @@ The Google Apps Script endpoint must accept an `action` parameter:
 The app generates random color palettes on each theme toggle, ensuring:
 
 - High contrast for readability (WCAG-compliant)
-- Harmonious color relationships (complementary/triadic/analogous)
+- Harmonious color relationships (complementary/triadic/analogous) (I mean...harmonius is probably subjective, but they're technically harmonius)
 - Consistent status colors (success/warning/error remain pastel and static)
 - Soft text colors derived from the theme palette
 
@@ -144,38 +145,11 @@ All colors are CSS custom properties (`:root` variables) generated in JavaScript
 - **≤ 1100px**: Podiums/Splits stack vertically
 - **> 1100px**: Full multi-column layout (desktop)
 
-## Run Locally
+## Run Locally or Deploy
 
 1. Open `index.html` or `stats.html` in a modern browser
 2. No build step required — pure HTML/CSS/JS
-
-## Deploy
-
-### GitHub Pages (Free, Public Repos)
-
-1. Create a public GitHub repository
-2. Add all project files to the repository
-3. Go to **Settings → Pages**
-4. Set source to **main** branch, **/ (root)** folder
-5. GitHub will provide a URL: `https://username.github.io/repo-name/`
-
-### Netlify (Free, Drag & Drop)
-
-1. Sign up at [netlify.com](https://netlify.com)
-2. Drag and drop your project folder
-3. Instant deployment with custom domain support
-
-### Cloudflare Pages (Free)
-
-1. Connect your GitHub repo to Cloudflare Pages
-2. Set build command to `none` (static site)
-3. Deploy automatically on every push
-
-## Browser Support
-
-- Modern browsers with ES6+ support
-- Chrome/Edge/Firefox/Safari (last 2 years)
-- No IE11 support (uses CSS Grid, `fetch`, arrow functions)
+3. We use GitHub pages, but choose your flavour of free hosting
 
 ## File Structure
 

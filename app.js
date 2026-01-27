@@ -55,6 +55,11 @@ const elements = {
     document.querySelector("[data-role='podium-busy-2']"),
     document.querySelector("[data-role='podium-busy-3']"),
   ],
+  podiumItems: [
+    document.querySelector("[data-role='podium-items-1']"),
+    document.querySelector("[data-role='podium-items-2']"),
+    document.querySelector("[data-role='podium-items-3']"),
+  ],
   status: document.querySelector("[data-role='status']"),
   statusText: document.querySelector("[data-role='status-text']"),
   statusSpinner: document.querySelector("[data-role='status-spinner']"),
@@ -69,6 +74,87 @@ const state = {
   needColours: new Map(),
   needHueSeed: Math.floor(Math.random() * 360),
   needIndex: 0,
+  stopWords: null,
+};
+
+const CUSTOM_STOP_WORDS = [
+  // Adjectives - Size, Age, Condition
+  "big", "small", "little", "large", "huge", "tiny", "old", "new", "ancient",
+  "modern", "vintage", "antique", "broken", "damaged", "faulty", "working",
+  "non", "functional", "good", "bad", "fine", "great", "lovely", "nice", "poor",
+  "excellent", "terrible", "heavy", "light", "thick", "thin",
+  
+  // Colors
+  "red", "blue", "green", "yellow", "black", "white", "orange", "purple", "pink",
+  "brown", "grey", "gray", "silver", "gold", "beige", "cream", "navy", "maroon",
+  "turquoise", "cyan", "magenta", "violet", "indigo", "tan", "khaki",
+  
+  // Materials (generic descriptors, not specific enough to be useful)
+  "plastic", "metal", "wooden", "wood", "steel", "iron", "brass", "copper",
+  "fabric", "leather", "cotton", "wool", "silk", "polyester", "glass", "ceramic",
+  "stone", "rubber", "foam", "cardboard", "paper",
+  
+  // Power/Technology descriptors
+  "electric", "electrical", "electronic", "digital", "manual", "automatic",
+  "cordless", "wired", "wireless", "battery", "powered", "rechargeable", "mains",
+  
+  // Common repair-related terms (too generic)
+  "repair", "fix", "fixing", "mend", "mending", "issue", "problem", "faulty",
+  
+  // Generic item parts (too vague on their own)
+  "handle", "button", "switch", "cord", "cable", "plug", "socket", "lead",
+  "charger", "adapter", "remote", "control", "case", "cover", "stand", "base",
+  "lid", "door", "drawer", "knob", "dial",
+  
+  // Measurement/quantity
+  "inch", "inches", "cm", "mm", "litre", "liter", "volt", "watt", "amp",
+  "size", "piece", "set", "pair", "pack",
+];
+
+const fetchStopWords = async () => {
+  try {
+    const response = await fetch(
+      "https://raw.githubusercontent.com/stopwords-iso/stopwords-en/master/stopwords-en.json",
+      { cache: "force-cache" }
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const remoteWords = await response.json();
+    return new Set([...remoteWords, ...CUSTOM_STOP_WORDS]);
+  } catch (error) {
+    console.warn("Failed to fetch stop words, using fallback:", error);
+    return new Set(CUSTOM_STOP_WORDS);
+  }
+};
+
+const tokenizeItem = (itemName) => {
+  if (!itemName || typeof itemName !== "string") {
+    return [];
+  }
+  const stopWords = state.stopWords || new Set(CUSTOM_STOP_WORDS);
+  return itemName
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .split(/\s+/)
+    .filter((word) => word.length > 2 && !stopWords.has(word));
+};
+
+const analyzeCommonItems = (items) => {
+  const wordCounts = new Map();
+  items.forEach((item) => {
+    const words = tokenizeItem(item?.item);
+    words.forEach((word) => {
+      wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+    });
+  });
+  return Array.from(wordCounts.entries())
+    .map(([word, count]) => ({
+      name: word.charAt(0).toUpperCase() + word.slice(1),
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
 };
 
 const normaliseStatus = (status) => (status || "").trim().toLowerCase();
@@ -799,6 +885,11 @@ const renderPodiums = (completedItems, allItems, range) => {
   renderPodium(elements.podiumBusy, busiest, (entry) =>
     entry ? `${entry.count} repairs` : "—"
   );
+
+  const commonItems = analyzeCommonItems(allItems);
+  renderPodium(elements.podiumItems, commonItems, (entry) =>
+    entry ? `${entry.count} repairs` : "—"
+  );
 };
 
 const chartState = {
@@ -1153,7 +1244,12 @@ const refreshCharts = () => {
   renderStats(state.lastPayload);
 };
 
-const init = () => {
+const init = async () => {
+  // Fetch stop words once on page load (stats page only)
+  if (pageAction === "closed_repairs") {
+    state.stopWords = await fetchStopWords();
+  }
+
   elements.title.textContent = CONFIG.title;
   if (CONFIG.logoUrl) {
     elements.logo.src = CONFIG.logoUrl;

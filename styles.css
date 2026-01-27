@@ -451,7 +451,7 @@ body {
 
 .podium-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 16px;
 }
 
@@ -503,12 +503,15 @@ body {
 .podium-name {
   margin: 0;
   font-weight: 700;
+  text-align: center;
+  word-break: break-word;
 }
 
 .podium-value {
   margin: 0;
   color: var(--muted);
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .score-highlight .score-value {
