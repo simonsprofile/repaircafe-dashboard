@@ -1,8 +1,7 @@
 const CONFIG = {
   title: "Nunhead Repair Café",
   logoUrl: "",
-  endpoint:
-    "https://script.google.com/macros/s/AKfycbz3cVv4oZkfBiX550T8fW0nC1tHxH4tyEc9Bv4KnOqnzFUkX8FhhMCDtpSCYZ0i4vly/exec",
+  endpoint: typeof API_CONFIG !== 'undefined' ? API_CONFIG.endpoint : "",
   pollIntervalMs: 10000,
   requestTimeoutMs: 20000,
 };

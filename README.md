@@ -48,15 +48,39 @@ Both share the same design system with a dynamic random-contrast theming engine 
 
 ## Configuration
 
-Edit the `CONFIG` object in `app.js`:
+### Initial Setup
+
+1. **Create your config file**:
+   ```bash
+   cp config.example.js config.js
+   ```
+
+2. **Add your Google Apps Script endpoint**:
+   Open `config.js` and update the endpoint URL:
+   ```javascript
+   const API_CONFIG = {
+     endpoint: "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec",
+   };
+   ```
+
+3. **Get your GAS endpoint**:
+   - Open your Google Apps Script project
+   - Click **Deploy** → **Manage deployments**
+   - Copy the **Web app URL**
+   - Paste it into `config.js`
+
+**Note**: `config.js` is gitignored, so your endpoint stays private and won't be overwritten when you pull updates.
+
+### Optional Customization
+
+Edit the `CONFIG` object in `app.js` for site-wide settings:
 
 ```javascript
 const CONFIG = {
-  title: "Nunhead Repair Café",           // Site title
-  logoUrl: "",                             // Logo image URL (leave empty for Material Icon default)
-  endpoint: "YOUR_GAS_ENDPOINT_URL",      // Google Apps Script web app URL
-  pollIntervalMs: 10000,                   // Default refresh interval (10s for dashboard)
-  requestTimeoutMs: 20000,                 // API timeout threshold
+  title: "Nunhead Repair Café",    // Site title (appears in header)
+  logoUrl: "",                      // Logo image URL (leave empty for Material Icon default)
+  pollIntervalMs: 10000,            // Refresh interval (10s for dashboard, 5min for stats)
+  requestTimeoutMs: 20000,          // API timeout threshold
 };
 ```
 
@@ -147,20 +171,23 @@ All colors are CSS custom properties (`:root` variables) generated in JavaScript
 
 ## Run Locally or Deploy
 
-1. Open `index.html` or `stats.html` in a modern browser
-2. No build step required — pure HTML/CSS/JS
-3. We use GitHub pages, but choose your flavour of free hosting
+1. **First time setup**: Copy `config.example.js` to `config.js` and add your API endpoint (see Configuration section above)
+2. Open `index.html` or `stats.html` in a modern browser
+3. No build step required — pure HTML/CSS/JS
+4. We use GitHub Pages, but choose your flavour of free hosting
 
 ## File Structure
 
 ```
 .
-├── index.html              # Live dashboard
-├── stats.html              # Statistics page
-├── app.js                  # Shared application logic
-├── styles.css              # Shared styles and theming
-├── dark_sparse_long_250.png  # Footer logo
-└── README.md               # This file
+├── index.html               # Live dashboard
+├── stats.html               # Statistics page
+├── app.js                   # Shared application logic
+├── styles.css               # Shared styles and theming
+├── config.example.js        # Configuration template (committed)
+├── config.js                # Your local config (gitignored)
+├── dark_sparse_long_250.png # Footer logo
+└── README.md                # This file
 ```
 
 ## Customization Tips

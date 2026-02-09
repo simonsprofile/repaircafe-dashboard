@@ -1,0 +1,15 @@
+# Local configuration (contains your specific API endpoint)
+config.js
+
+# macOS
+.DS_Store
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
